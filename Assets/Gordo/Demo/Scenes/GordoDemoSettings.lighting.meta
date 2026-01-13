@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: e952d99d3f175c04a9d6a24f25aca1a0
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 67236
+  packageName: Gordo 2D Character!
+  packageVersion: 2.44
+  assetPath: Assets/Gordo/Demo/Scenes/GordoDemoSettings.lighting
+  uploadId: 388436

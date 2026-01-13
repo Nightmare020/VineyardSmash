@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: 1995a9d9124f9ee42a6e3a9f45f4f5b7
+timeCreated: 1469022938
+licenseType: Store
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 67236
+  packageName: Gordo 2D Character!
+  packageVersion: 2.44
+  assetPath: Assets/Gordo/Demo/Prefabs/DAChkBox/Scripts/DAChkBox.cs
+  uploadId: 388436

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 8b2b629f96c1efc418a58e449639d511
+timeCreated: 1469026727
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 67236
+  packageName: Gordo 2D Character!
+  packageVersion: 2.44
+  assetPath: Assets/Gordo/Prefabs/DALogo/DALogo.prefab
+  uploadId: 388436
