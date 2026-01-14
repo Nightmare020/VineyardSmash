@@ -12,6 +12,22 @@ PrefabInstance:
       propertyPath: m_Name
       value: grape
       objectReference: {fileID: 0}
+    - target: {fileID: 100000, guid: 7b5ec5c57af98c349b22ae545a4a9fcd, type: 3}
+      propertyPath: m_TagString
+      value: Grapes
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: 7b5ec5c57af98c349b22ae545a4a9fcd, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: 7b5ec5c57af98c349b22ae545a4a9fcd, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: 7b5ec5c57af98c349b22ae545a4a9fcd, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 4
+      objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 7b5ec5c57af98c349b22ae545a4a9fcd, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -62,6 +78,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 100000, guid: 7b5ec5c57af98c349b22ae545a4a9fcd, type: 3}
       insertIndex: -1
       addedObject: {fileID: -2927344064121548455}
+    - targetCorrespondingSourceObject: {fileID: 100000, guid: 7b5ec5c57af98c349b22ae545a4a9fcd, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -4573404319861118724}
   m_SourcePrefab: {fileID: 100100000, guid: 7b5ec5c57af98c349b22ae545a4a9fcd, type: 3}
 --- !u!1 &113239210557073384 stripped
 GameObject:
@@ -147,3 +166,23 @@ PolygonCollider2D:
       - {x: 0.13122594, y: -0.18061672}
       - {x: 0.21232785, y: 0.068989396}
   m_UseDelaunayMesh: 1
+--- !u!257 &-4573404319861118724
+TargetJoint2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 113239210557073384}
+  m_Enabled: 1
+  serializedVersion: 4
+  m_EnableCollision: 1
+  m_ConnectedRigidBody: {fileID: 0}
+  m_BreakForce: Infinity
+  m_BreakTorque: Infinity
+  m_BreakAction: 3
+  m_Anchor: {x: 0, y: 0}
+  m_Target: {x: 0, y: 0}
+  m_AutoConfigureTarget: 0
+  m_MaxForce: 10000
+  m_DampingRatio: 1
+  m_Frequency: 5

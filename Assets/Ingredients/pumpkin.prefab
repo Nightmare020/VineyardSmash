@@ -12,6 +12,22 @@ PrefabInstance:
       propertyPath: m_Name
       value: pumpkin
       objectReference: {fileID: 0}
+    - target: {fileID: 100000, guid: e0104657a83d1374b8e7cda818970954, type: 3}
+      propertyPath: m_TagString
+      value: Vegetable + Fruit
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: e0104657a83d1374b8e7cda818970954, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: e0104657a83d1374b8e7cda818970954, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: e0104657a83d1374b8e7cda818970954, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 4
+      objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: e0104657a83d1374b8e7cda818970954, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -62,6 +78,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 100000, guid: e0104657a83d1374b8e7cda818970954, type: 3}
       insertIndex: -1
       addedObject: {fileID: -3448961357649123005}
+    - targetCorrespondingSourceObject: {fileID: 100000, guid: e0104657a83d1374b8e7cda818970954, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -7602648062847755880}
   m_SourcePrefab: {fileID: 100100000, guid: e0104657a83d1374b8e7cda818970954, type: 3}
 --- !u!1 &5374478143740284073 stripped
 GameObject:
@@ -147,3 +166,23 @@ PolygonCollider2D:
       - {x: 0.1257133, y: -0.17302948}
       - {x: 0.20340836, y: 0.06609141}
   m_UseDelaunayMesh: 1
+--- !u!257 &-7602648062847755880
+TargetJoint2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5374478143740284073}
+  m_Enabled: 1
+  serializedVersion: 4
+  m_EnableCollision: 1
+  m_ConnectedRigidBody: {fileID: 0}
+  m_BreakForce: Infinity
+  m_BreakTorque: Infinity
+  m_BreakAction: 3
+  m_Anchor: {x: 0, y: 0}
+  m_Target: {x: 0, y: 0}
+  m_AutoConfigureTarget: 0
+  m_MaxForce: 10000
+  m_DampingRatio: 1
+  m_Frequency: 5
