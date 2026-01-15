@@ -36,10 +36,19 @@ public class FoodBucketFiller : MonoBehaviour
     [Range(0f, 1f)] public float jointDampingRatio = 0.85f;
 
     [Header("Freeze after settling")]
-    public bool freezWhenSettled = true;
+    public bool freezeWhenSettled = true;
     public float settleVelocityThreshold = 0.05f;
     public float settleAngularThreshold = 2f;
     public float settleTimeRequired = 0.4f;
+
+    [Header("Snap + Freeze after settling")]
+    // How close before snapping
+    public float snapDistance = 0.03f;
+
+    // How close in rotation before snapping
+    public float snapAngleDeg = 3f;
+
+    public bool snapRotationUpright = true;
 
     // Parent spawned food under this transform
     public Transform spawnedParent;
@@ -69,9 +78,9 @@ public class FoodBucketFiller : MonoBehaviour
 
         // Compute interior rect
         float minX = bucketBounds.min.x + inset.x;
-        float maxX = bucketBounds.max.x + inset.x;
+        float maxX = bucketBounds.max.x - inset.x;
         float minY = bucketBounds.min.y + inset.y;
-        float maxY = bucketBounds.max.x + inset.y;
+        float maxY = bucketBounds.max.x - inset.y;
 
         float width = Mathf.Max(0.001f, maxX - minX);
         float height = Mathf.Max(0.001f, maxY - minY);
@@ -98,22 +107,22 @@ public class FoodBucketFiller : MonoBehaviour
                 spawnPos.x += Random.Range(-spawnJitterX, spawnJitterX);
 
                 GameObject prefab = foodPrefabs[Random.Range(0, foodPrefabs.Length)];
-                GameObject gameObject = Instantiate(prefab, spawnPos, Quaternion.identity, spawnedParent);
+                GameObject gamePrefab = Instantiate(prefab, spawnPos, Quaternion.identity, spawnedParent);
 
-                Rigidbody2D rigidBody = gameObject.GetComponent<Rigidbody2D>();
+                Rigidbody2D rigidBody = gamePrefab.GetComponent<Rigidbody2D>();
                 if (rigidBody == null)
                 {
-                    rigidBody = gameObject.AddComponent<Rigidbody2D>();
+                    rigidBody = gamePrefab.AddComponent<Rigidbody2D>();
                 }
                 rigidBody.bodyType = RigidbodyType2D.Dynamic;
                 rigidBody.gravityScale = Mathf.Max(0.01f, rigidBody.gravityScale);
 
                 // Pull to exact assigned slot
-                var targetJoint = gameObject.GetComponent<TargetJoint2D>();
+                var targetJoint = gamePrefab.GetComponent<TargetJoint2D>();
 
                 if (targetJoint == null)
                 {
-                    targetJoint = gameObject.AddComponent<TargetJoint2D>();
+                    targetJoint = gamePrefab.AddComponent<TargetJoint2D>();
                 }
                 targetJoint.autoConfigureTarget = false;
                 targetJoint.target = slotPos;
@@ -124,7 +133,7 @@ public class FoodBucketFiller : MonoBehaviour
                 // Clamp the joint's anchor a bit toward the center for stability
                 targetJoint.anchor = Vector2.zero;
 
-                if (freezWhenSettled)
+                if (freezeWhenSettled)
                 {
                     StartCoroutine(FreezeAfterSettled(rigidBody, targetJoint));
                 }
@@ -138,18 +147,40 @@ public class FoodBucketFiller : MonoBehaviour
 
         while (rigidBody != null)
         {
+            // Distance/angle to target
+            float dist = targetJoint != null
+                ? Vector2.Distance(rigidBody.position, targetJoint.target)
+                : 0f;
+
+            float angle = Mathf.Abs(Mathf.DeltaAngle(rigidBody.rotation, 0f));
+            
             bool stable =
                 rigidBody.linearVelocity.magnitude < settleVelocityThreshold &&
-                Mathf.Abs(rigidBody.angularVelocity) < settleAngularThreshold;
+                Mathf.Abs(rigidBody.angularVelocity) < settleAngularThreshold &&
+                dist < snapDistance &&
+                (!snapRotationUpright || angle < snapAngleDeg);
 
             stableTime = stable ? stableTime + Time.deltaTime : 0f;
 
             if (stableTime >= settleTimeRequired)
             {
-                // Lock in place
+                // Snap exactly into place
+                if (targetJoint != null)
+                {
+                    rigidBody.position = targetJoint.target;
+                }
+
+                if (snapRotationUpright)
+                {
+                    rigidBody.rotation = 0f;
+                }
+                
+                // Lock in place and stop motion
                 rigidBody.linearVelocity = Vector2.zero;
                 rigidBody.angularVelocity = 0f;
-                rigidBody.bodyType = RigidbodyType2D.Kinematic;
+                
+                // freeze completely
+                rigidBody.bodyType = RigidbodyType2D.Static;
 
                 // Remove this joint so it doesn't keep applying forces
                 if (targetJoint != null)
