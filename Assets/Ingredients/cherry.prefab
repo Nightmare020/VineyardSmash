@@ -74,46 +74,16 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 100000, guid: 93b3b0626c40d3445a72c4ceab70561b, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 5194025807394991116}
-    - targetCorrespondingSourceObject: {fileID: 100000, guid: 93b3b0626c40d3445a72c4ceab70561b, type: 3}
-      insertIndex: -1
       addedObject: {fileID: 4286997143923652229}
     - targetCorrespondingSourceObject: {fileID: 100000, guid: 93b3b0626c40d3445a72c4ceab70561b, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 4742137540289821613}
+      addedObject: {fileID: 2808187089351710774}
   m_SourcePrefab: {fileID: 100100000, guid: 93b3b0626c40d3445a72c4ceab70561b, type: 3}
 --- !u!1 &8709181005875338377 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 100000, guid: 93b3b0626c40d3445a72c4ceab70561b, type: 3}
   m_PrefabInstance: {fileID: 8709181005875305001}
   m_PrefabAsset: {fileID: 0}
---- !u!50 &5194025807394991116
-Rigidbody2D:
-  serializedVersion: 5
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8709181005875338377}
-  m_BodyType: 0
-  m_Simulated: 1
-  m_UseFullKinematicContacts: 0
-  m_UseAutoMass: 0
-  m_Mass: 1
-  m_LinearDamping: 0
-  m_AngularDamping: 0.05
-  m_GravityScale: 1
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_Interpolate: 0
-  m_SleepingMode: 1
-  m_CollisionDetection: 1
-  m_Constraints: 0
 --- !u!60 &4286997143923652229
 PolygonCollider2D:
   m_ObjectHideFlags: 0
@@ -166,23 +136,16 @@ PolygonCollider2D:
       - {x: 0.12467232, y: -0.17159672}
       - {x: 0.20172401, y: 0.065544106}
   m_UseDelaunayMesh: 1
---- !u!257 &4742137540289821613
-TargetJoint2D:
+--- !u!114 &2808187089351710774
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8709181005875338377}
   m_Enabled: 1
-  serializedVersion: 4
-  m_EnableCollision: 1
-  m_ConnectedRigidBody: {fileID: 0}
-  m_BreakForce: Infinity
-  m_BreakTorque: Infinity
-  m_BreakAction: 3
-  m_Anchor: {x: 0, y: 0}
-  m_Target: {x: 0, y: 0}
-  m_AutoConfigureTarget: 0
-  m_MaxForce: 10000
-  m_DampingRatio: 1
-  m_Frequency: 5
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 61c242b1174d97041acbf58e74289841, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FoodId
+  id: cherries

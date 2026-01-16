@@ -22,7 +22,7 @@ public class BucketTopCharacterController2D : MonoBehaviour
     
     [Header("Animation")]
     public Animator animator;
-    //public string runBool = "IsRunning";
+    public string runBool = "IsRunning";
     
     [Header("Character collider for clamping")]
     public Collider2D clampingCollider;
@@ -70,12 +70,12 @@ public class BucketTopCharacterController2D : MonoBehaviour
             inputX = 1f;
         }
 
-        /*
+        
         if (animator != null)
         {
             animator.SetBool(runBool, Mathf.Abs(inputX) > 0.01f);
         }
-        */
+        
         
         // Flip the whole rig visually
         if (Mathf.Abs(inputX) > 0.01f)

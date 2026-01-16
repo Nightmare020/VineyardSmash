@@ -74,46 +74,16 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 100000, guid: e0104657a83d1374b8e7cda818970954, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 3675655825955363636}
-    - targetCorrespondingSourceObject: {fileID: 100000, guid: e0104657a83d1374b8e7cda818970954, type: 3}
-      insertIndex: -1
       addedObject: {fileID: -3448961357649123005}
     - targetCorrespondingSourceObject: {fileID: 100000, guid: e0104657a83d1374b8e7cda818970954, type: 3}
       insertIndex: -1
-      addedObject: {fileID: -7602648062847755880}
+      addedObject: {fileID: -9115205995489628802}
   m_SourcePrefab: {fileID: 100100000, guid: e0104657a83d1374b8e7cda818970954, type: 3}
 --- !u!1 &5374478143740284073 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 100000, guid: e0104657a83d1374b8e7cda818970954, type: 3}
   m_PrefabInstance: {fileID: 5374478143740185097}
   m_PrefabAsset: {fileID: 0}
---- !u!50 &3675655825955363636
-Rigidbody2D:
-  serializedVersion: 5
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5374478143740284073}
-  m_BodyType: 0
-  m_Simulated: 1
-  m_UseFullKinematicContacts: 0
-  m_UseAutoMass: 0
-  m_Mass: 1
-  m_LinearDamping: 0
-  m_AngularDamping: 0.05
-  m_GravityScale: 1
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_Interpolate: 0
-  m_SleepingMode: 1
-  m_CollisionDetection: 1
-  m_Constraints: 0
 --- !u!60 &-3448961357649123005
 PolygonCollider2D:
   m_ObjectHideFlags: 0
@@ -166,23 +136,16 @@ PolygonCollider2D:
       - {x: 0.1257133, y: -0.17302948}
       - {x: 0.20340836, y: 0.06609141}
   m_UseDelaunayMesh: 1
---- !u!257 &-7602648062847755880
-TargetJoint2D:
+--- !u!114 &-9115205995489628802
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5374478143740284073}
   m_Enabled: 1
-  serializedVersion: 4
-  m_EnableCollision: 1
-  m_ConnectedRigidBody: {fileID: 0}
-  m_BreakForce: Infinity
-  m_BreakTorque: Infinity
-  m_BreakAction: 3
-  m_Anchor: {x: 0, y: 0}
-  m_Target: {x: 0, y: 0}
-  m_AutoConfigureTarget: 0
-  m_MaxForce: 10000
-  m_DampingRatio: 1
-  m_Frequency: 5
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 61c242b1174d97041acbf58e74289841, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FoodId
+  id: pumpkin

@@ -199,6 +199,16 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 128850, guid: b6ed95875921a1f4f9c6f17b9f812b11, type: 3}
   m_PrefabInstance: {fileID: 1401900171}
   m_PrefabAsset: {fileID: 0}
+--- !u!95 &64405021 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 9563046, guid: b6ed95875921a1f4f9c6f17b9f812b11, type: 3}
+  m_PrefabInstance: {fileID: 1401900171}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &64405022 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 404906, guid: b6ed95875921a1f4f9c6f17b9f812b11, type: 3}
+  m_PrefabInstance: {fileID: 1401900171}
+  m_PrefabAsset: {fileID: 0}
 --- !u!61 &64405023
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -272,6 +282,28 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!114 &64405025
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 64405017}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6278b94fdacf67d459c8c0cf4493e4d3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BucketTopCharacterController2D
+  moveSpeed: 6
+  topRail: {fileID: 404767385}
+  yOffset: 0
+  bucketBoundsCollider: {fileID: 434714626}
+  xMargin: 0.2
+  visualRoot: {fileID: 1319805522}
+  faceRightIsPositiveScale: 1
+  animator: {fileID: 64405021}
+  runBool: IsRunning
+  clampingCollider: {fileID: 0}
 --- !u!1 &188483939
 GameObject:
   m_ObjectHideFlags: 0
@@ -737,7 +769,7 @@ Transform:
   m_GameObject: {fileID: 404767384}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.101, y: 0.22, z: 0}
+  m_LocalPosition: {x: -0.101, y: 0.428, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -862,7 +894,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0.00099994, y: -0.02056, z: 0}
-  m_LocalScale: {x: 0.9604182, y: 0.9243549, z: 0.98164725}
+  m_LocalScale: {x: 0.9924573, y: 0.9551909, z: 1.0143945}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1080663363}
@@ -2311,6 +2343,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FoodBucketFiller
   bucketBoundsCollider: {fileID: 434714626}
+  inset: {x: 0.2, y: 0.2}
+  columns: 5
+  rows: 5
   foodPrefabs:
   - {fileID: 7090000081690452566, guid: 0821be7aff272804b988d483c88bb319, type: 3}
   - {fileID: 5882146166323527522, guid: 502c1109b32d9eb4aba1fbbdae817276, type: 3}
@@ -2325,23 +2360,29 @@ MonoBehaviour:
   - {fileID: 5374478143740284073, guid: 23e6481665db5f24aa51c5af694efb13, type: 3}
   - {fileID: 64048154199456964, guid: c480aa3a8f36f0c48ad4d414622acd7c, type: 3}
   - {fileID: 3851199129449591006, guid: c2bf30777318dba48b2009549fd6b047, type: 3}
-  columns: 5
-  rows: 5
-  inset: {x: 0.2, y: 0.2}
-  cellShrink: 0.15
-  spawnHeight: 3
-  spawnJitterX: 0.05
-  jointMaxForce: 200
-  jointFrequency: 6
-  jointDampingRatio: 0.85
-  freezeWhenSettled: 1
-  settleVelocityThreshold: 0.05
-  settleAngularThreshold: 2
-  settleTimeRequired: 0.4
-  snapDistance: 0.03
-  snapAngleDeg: 3
-  snapRotationUpright: 1
   spawnedParent: {fileID: 1285916528}
+  characterRoot: {fileID: 64405022}
+  nextColumnImages:
+  - {fileID: 946607498}
+  - {fileID: 1913302350}
+  - {fileID: 2030362742}
+  - {fileID: 1827575373}
+  - {fileID: 767357457}
+  nextTextureBank:
+  - {fileID: 2800000, guid: 73b128e5d6ccb534591676e89e99dc94, type: 3}
+  - {fileID: 2800000, guid: 9117a91a921090e48bcfa97d957d8a73, type: 3}
+  - {fileID: 2800000, guid: f3595be2c5ad935438866af960b47654, type: 3}
+  - {fileID: 2800000, guid: 0db9033b56cae9d47b55d2c7d57dacc0, type: 3}
+  - {fileID: 2800000, guid: b758f67e308582242812ae876749beb5, type: 3}
+  - {fileID: 2800000, guid: 0e175e92bdf84b14d8ea76dbdf86bf6e, type: 3}
+  - {fileID: 2800000, guid: 8d7c2f3ca3eb5c446ad0dce5eb6737ba, type: 3}
+  - {fileID: 2800000, guid: c69e775a39d1db44da6db953a3491590, type: 3}
+  - {fileID: 2800000, guid: 4056a45525481ce418496e910ab6b88b, type: 3}
+  - {fileID: 2800000, guid: c41d72e50f39c6f4ba5b550c79edb0ce, type: 3}
+  - {fileID: 2800000, guid: ba2fa930a5938994b8172821b764f25e, type: 3}
+  - {fileID: 2800000, guid: 9cf6e15d2934d6d468ba790618c3bafc, type: 3}
+  - {fileID: 2800000, guid: fda272b7bde84194395b2bc71672052e, type: 3}
+  xMargin: 0
 --- !u!1 &1264078875
 GameObject:
   m_ObjectHideFlags: 0
@@ -2515,6 +2556,11 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1080663363}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!4 &1319805522 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 8803975870328700731, guid: b6ed95875921a1f4f9c6f17b9f812b11, type: 3}
+  m_PrefabInstance: {fileID: 1401900171}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1401900171
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2541,11 +2587,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 404906, guid: b6ed95875921a1f4f9c6f17b9f812b11, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -6.0381
+      value: -5.67
       objectReference: {fileID: 0}
     - target: {fileID: 404906, guid: b6ed95875921a1f4f9c6f17b9f812b11, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 2.9
+      value: 5.19
       objectReference: {fileID: 0}
     - target: {fileID: 404906, guid: b6ed95875921a1f4f9c6f17b9f812b11, type: 3}
       propertyPath: m_LocalPosition.z
@@ -2589,6 +2635,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 128850, guid: b6ed95875921a1f4f9c6f17b9f812b11, type: 3}
       insertIndex: -1
       addedObject: {fileID: 64405023}
+    - targetCorrespondingSourceObject: {fileID: 128850, guid: b6ed95875921a1f4f9c6f17b9f812b11, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 64405025}
   m_SourcePrefab: {fileID: 100100000, guid: b6ed95875921a1f4f9c6f17b9f812b11, type: 3}
 --- !u!1 &1484402436
 GameObject:
