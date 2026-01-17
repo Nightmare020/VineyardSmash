@@ -56,6 +56,10 @@ public class BucketGameLogic : MonoBehaviour
 
     [Header("Audio")] 
     public StepFoodAudio audioCtrl;
+    
+    [Header("Points Popup UI")]
+    public TMPro.TextMeshProUGUI pointsGainedText;
+    public float pointsGainedShowSeconds = 1f;
 
     private void OnDestroy()
     {
@@ -306,7 +310,10 @@ public class BucketGameLogic : MonoBehaviour
     {
         if (challengeIsCake)
         {
+            int gained = score.cakePoints;
             score.AddCake();
+            
+            ShowPointsGained(gained);
             
             if (audioCtrl)
             {
@@ -317,7 +324,10 @@ public class BucketGameLogic : MonoBehaviour
         }
         
         // 5 items in the row
-        score.Add(challengePointsPerItem * grid.Columns);
+        int gainedNormal = challengePointsPerItem * grid.Columns;
+        score.Add(gainedNormal);
+        
+        ShowPointsGained(gainedNormal);
         
         if (audioCtrl)
         {
@@ -521,5 +531,28 @@ public class BucketGameLogic : MonoBehaviour
         // Re-check initial conditions
         CheckWinCondition();
         CheckStartChallengeFromTopRow();
+    }
+
+    private void ShowPointsGained(int amount)
+    {
+        if (pointsGainedText == null)
+        {
+            return;
+        }
+        
+        pointsGainedText.text = $"+{amount}";
+        pointsGainedText.gameObject.SetActive(true);
+        CancelInvoke(nameof(HidePointsGained));
+        Invoke(nameof(HidePointsGained), pointsGainedShowSeconds);
+    }
+
+    private void HidePointsGained()
+    {
+        if (pointsGainedText == null)
+        {
+            return;
+        }
+        
+        pointsGainedText.gameObject.SetActive(false);
     }
 }
