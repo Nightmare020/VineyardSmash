@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.InputSystem;
 using Random = UnityEngine.Random;
 
 public class FoodBucketGrid : MonoBehaviour
@@ -14,8 +13,11 @@ public class FoodBucketGrid : MonoBehaviour
     public Vector2 inset = new Vector2(0.2f, 0.2f);
 
     [Header("Grid Size")]
-    [Min(1)] public int columns = 4;
-    [Min(1)] public int rows = 4;
+    [Min(1)] private int columns = 5;
+    [Min(1)] private int rows = 5;
+    
+    // One extra row for visual overflow
+    private int overflowRows = 1;
     
     [Header("Food Prefabs")]
     public GameObject[] foodPrefabs;
@@ -36,6 +38,16 @@ public class FoodBucketGrid : MonoBehaviour
     private GameObject[,] grid;
     private Vector2[,] slots;
     private string[] nextId;
+
+    [Header("Input")] 
+    public bool handleInputInternally = false;
+
+    // Playable capacity
+    public int CapacityRows => rows;
+    public int TotalRows => rows + overflowRows;
+    
+    public int Rows => TotalRows;
+    public int Columns => columns;
     
     // ID to prefab
     private Dictionary<string, GameObject> prefabById = new Dictionary<string, GameObject>();
@@ -46,8 +58,53 @@ public class FoodBucketGrid : MonoBehaviour
     // List of IDs for random pick
     private List<string> ids = new List<string>();
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public float CellHeight
+    {
+        get
+        {
+            Bounds bounds = bucketBoundsCollider.bounds;
+            float minY = bounds.min.y + inset.y;
+            float maxY = bounds.max.y - inset.y;
+            float height = Mathf.Max(0.001f, maxY - minY);
+            return height / CapacityRows;
+        }
+    }
+
+    public int CurrentHeight
+    {
+        get
+        {
+            if (grid == null)
+            {
+                return -1;
+            }
+            
+            int height = 0;
+            for (int r = 0; r < Rows; r++)
+            {
+                bool any = false;
+                for (int c = 0; c < Columns; c++)
+                {
+                    if (grid[r, c])
+                    {
+                        any = true;
+                        break;
+                    }
+                }
+
+                if (any)
+                {
+                    height = r + 1;
+                }
+            }
+
+            return height;
+        }
+    }
+    
+    public bool IsInitialized => grid != null;
+
+    private void Awake()
     {
         if (bucketBoundsCollider == null || foodPrefabs == null || foodPrefabs.Length == 0)
         {
@@ -55,28 +112,22 @@ public class FoodBucketGrid : MonoBehaviour
             enabled = false;
             return;
         }
-
+        
         BuildPrefabIndex();
         BuildTextureIndex();
         BuildSlots();
         InitGrid();
         InitNextQueueAndUI();
     }
-    
-    // Update is called once per frame
-    void Update()
-    {
-        var mouse = Mouse.current;
-        if (mouse == null)
-        {
-            return;
-        }
 
-        if (mouse.leftButton.wasPressedThisFrame || mouse.rightButton.wasPressedThisFrame)
-        {
-            StepColumnUnderCharacter();
-        }
+    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    void Start()
+    {
     }
+    
+    public GameObject Cell(int r, int c) => grid[r, c];
+
+    public int GetColumnUnderX(float x) => GetColumnFromX(x);
 
     private void BuildTextureIndex()
     {
@@ -154,8 +205,8 @@ public class FoodBucketGrid : MonoBehaviour
 
     private void BuildSlots()
     {
-        grid = new GameObject[rows, columns];
-        slots = new Vector2[rows, columns];
+        grid = new GameObject[TotalRows, columns];
+        slots = new Vector2[TotalRows, columns];
         
         Bounds bucketBounds = bucketBoundsCollider.bounds;
 
@@ -168,9 +219,10 @@ public class FoodBucketGrid : MonoBehaviour
         float height = Mathf.Max(0.001f, maxY - minY);
 
         float cellW = width / columns;
-        float cellH = height / rows;
+        float cellH = height / CapacityRows;
 
-        for (int r = 0; r < rows; r++)
+        // Playable rows fill the bucket area
+        for (int r = 0; r < CapacityRows; r++)
         {
             for (int c = 0; c < columns; c++)
             {
@@ -180,11 +232,23 @@ public class FoodBucketGrid : MonoBehaviour
                     );
             }
         }
+        
+        // Overflow rows go above the bucket area
+        for (int r = CapacityRows; r < TotalRows; r++)
+        {
+            for (int c = 0; c < columns; c++)
+            {
+                slots[r, c] = new Vector2(
+                    minX + (c + 0.5f) * cellW,
+                    maxY + ((r - CapacityRows) + 0.5f) * cellH
+                );
+            }
+        }
     }
 
     private void InitGrid()
     {
-        for (int r = 0; r < rows; r++)
+        for (int r = 0; r < CapacityRows; r++)
         {
             for (int c = 0; c < columns; c++)
             {
@@ -235,42 +299,61 @@ public class FoodBucketGrid : MonoBehaviour
         }
     }
 
-    private void StepColumnUnderCharacter()
+    public void StepColumnShiftAndSpawn(int column)
     {
-        if (characterRoot == null)
+        int height = CurrentHeight;
+
+        if (height <= 0)
         {
-            Debug.LogWarning("No character root found");
             return;
         }
         
-        int col = GetColumnFromX(characterRoot.position.x);
-        
-        int topRow = rows - 1;
+        int topRow = height - 1;
         
         // Destroy top cell in that column
-        if (grid[topRow, col])
+        if (grid[topRow, column])
         {
-            Destroy(grid[topRow, col]);
+            Destroy(grid[topRow, column]);
         }
         
         // Shift everything up, so row - 1 is row now
         for (int r = topRow; r >= 1; r--)
         {
-            grid[r, col] = grid[r - 1, col];
-            if (grid[r, col])
+            grid[r, column] = grid[r - 1, column];
+            if (grid[r, column])
             {
-                grid[r, col].transform.position = slots[r, col];
+                grid[r, column].transform.position = slots[r, column];
             }
         }
 
         // Insert the next prefab at the bottom
-        grid[0, col] = SpawnFood(nextId[col], slots[0, col]);
+        grid[0, column] = SpawnFood(nextId[column], slots[0, column]);
             
         // Roll next prefab and update UI
-        RollNextForColumn(col);
+        RollNextForColumn(column);
+    }
+    
+    // Remove only top cell
+    public bool ChallengeRemoveTopCell(int column)
+    {
+        int height = CurrentHeight;
+        if (height <= 0)
+        {
+            return false;
+        }
+        
+        int topRow = height - 1;
+        if (grid[topRow, column] == null)
+        {
+            return false;
+        }
+        
+        Destroy(grid[topRow, column]);
+        grid[topRow, column] = null;
+        return true;
     }
 
-    private int GetColumnFromX(float worldX)
+    public int GetColumnFromX(float worldX)
     {
         Bounds bucketBounds = bucketBoundsCollider.bounds;
         
@@ -308,19 +391,57 @@ public class FoodBucketGrid : MonoBehaviour
         var gameObject = Instantiate(prefab, pos, Quaternion.identity, spawnedParent);
         
         // Remove rigid body and joints
-        var targetJoint = gameObject.GetComponent<TargetJoint2D>();
-        if (targetJoint)
+        foreach (var targetJoint in gameObject.GetComponentsInChildren<TargetJoint2D>())
         {
             Destroy(targetJoint);
         }
 
-        var rigidBody = gameObject.GetComponent<Rigidbody2D>();
-        if (rigidBody)
+        foreach (var rigidBody in gameObject.GetComponentsInChildren<Rigidbody2D>())
         {
             Destroy(rigidBody);
         }
         
         return gameObject;
+    }
+    
+    // Add a full new row from the UI at the bottom
+    public bool TryAddNewRowFromBottom()
+    {
+        int height = CurrentHeight;
+        
+        // If already full, adding another row would exceed the bucket, which means game over
+        if (height >= TotalRows)
+        {
+            return false;
+        }
+
+        bool overflow = (height >= CapacityRows);
+        
+        // When full, shift all rows up by 1 inside the fixed grid
+        int shiftFromRow = Mathf.Min(height, TotalRows - 1);
+        
+        // Shift existing rows up by 1
+        for (int r = shiftFromRow; r >= 1; r--)
+        {
+            for (int c = 0; c < Columns; c++)
+            {
+                grid[r, c] = grid[r - 1, c];
+                if (grid[r, c])
+                {
+                    grid[r, c].transform.position = slots[r, c];
+                }
+            }
+        }
+        
+        // Insert new bottom row from UI preview for each column
+        for (int c = 0; c < columns; c++)
+        {
+            grid[0, c] = SpawnFood(nextId[c], slots[0, c]);
+            RollNextForColumn(c);
+        }
+
+        // returns false only to signal overflow and game over, after visual update
+        return !overflow;
     }
 
     private string RandomId()
@@ -382,6 +503,7 @@ public class FoodBucketGrid : MonoBehaviour
         }
 
         s = s.Trim().ToLowerInvariant();
+        s = s.Replace("(clone)", "");
         s = s.Replace(" ", "");
         s = s.Replace("_", "");
         s = s.Replace("-", "");
@@ -397,5 +519,28 @@ public class FoodBucketGrid : MonoBehaviour
         
         return Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), 
             new Vector2(0.5f, 0.5f), 100f);
+    }
+
+    public void ResetGridAndUI()
+    {
+        // Destroy all spawned objects
+        if (grid != null)
+        {
+            for (int r = 0; r < Rows; r++)
+            {
+                for (int c = 0; c < Columns; c++)
+                {
+                    if (grid[r, c])
+                    {
+                        Destroy(grid[r, c]);
+                        grid[r, c] = null;
+                    }
+                }
+            }
+        }
+        
+        // Re-roll the next queue and refill the playable area
+        InitNextQueueAndUI();
+        InitGrid();
     }
 }

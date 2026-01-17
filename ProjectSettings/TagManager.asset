@@ -9,7 +9,6 @@ TagManager:
   - Fruit
   - Vegetable + Fruit
   - Chocolate
-  - Eggs
   - Grapes
   layers:
   - Default

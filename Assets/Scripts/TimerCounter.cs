@@ -66,4 +66,20 @@ public class TimerCounter : MonoBehaviour
             timerText.text = string.Format("{0:D2}:{1:D2}.{2:D2}", minutes, seconds, hundreths);
         }
     }
+
+    public void StopTimer()
+    {
+        isRunning = false;
+    }
+
+    public void StartTimer(bool reset = false)
+    {
+        if (reset)
+        {
+            elapsedSeconds = 0f;
+            UpdateDisplay(0f);
+        }
+
+        isRunning = true;
+    }
 }

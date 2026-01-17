@@ -1,42 +1,28 @@
+using System;
 using UnityEngine;
 using TMPro;
 
 public class RepeatableTimerCountdown : MonoBehaviour
 {
     [Header("Timer Settings")]
-    public float durationInSecondsNewRow = 30f;
-    public float durationInSecondsStepRow = 60f;
+    public float durationInSecondsNewRow = 60f;
+    public float durationInSecondsStepRow = 30f;
 
     // Flag for the timer to restart autmatically when it reaches zero if true
     public bool autoRestart;
 
+    [Header("UI Elements")]
+    public TextMeshProUGUI countdownTimerText;
+    
     // Flag to use step on fruits timer or normal new row timer
     private bool useStepTimer = false;
 
-    [Header("UI Elements")]
-    public TextMeshProUGUI countdownTimerText;
-
     private float remainingSeconds;
 
-    private void OnValidate()
-    {
-        if (!useStepTimer)
-        {
-            // Prevent negative durations
-            if (durationInSecondsNewRow < 0f)
-            {
-                durationInSecondsNewRow = 0f;
-            }
-        }
-        else
-        {
+    public event Action TimerExpired;
 
-            if (durationInSecondsStepRow < 0f)
-            {
-                durationInSecondsStepRow = 0f;
-            }
-        }
-    }
+    public float RemainingSeconds => remainingSeconds;
+    public bool UsingStepTimer => useStepTimer;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -48,7 +34,9 @@ public class RepeatableTimerCountdown : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (durationInSecondsNewRow <= 0f && durationInSecondsStepRow <= 0f)
+        float duration = useStepTimer ? durationInSecondsStepRow : durationInSecondsNewRow;
+        
+        if (duration <= 0f)
         {
             return;
         }
@@ -59,6 +47,8 @@ public class RepeatableTimerCountdown : MonoBehaviour
         {
             remainingSeconds = 0f;
             UpdateTimerUI();
+            
+            TimerExpired?.Invoke();
 
             if (autoRestart)
             {
@@ -76,19 +66,16 @@ public class RepeatableTimerCountdown : MonoBehaviour
         }
     }
 
-    public void SetDurationSeconds(float seconds)
+    public void UseStepTimerMode(bool stepMode, bool restartNow = true)
     {
-        if (!useStepTimer)
-        {
-            durationInSecondsNewRow = Mathf.Max(0f,seconds);
-        }
-        else
-        {
-            durationInSecondsStepRow = Mathf.Max(0f,seconds);
-        }
+        useStepTimer = stepMode;
+        enabled = true;
 
-        ResetTimer();
-        UpdateTimerUI();
+        if (restartNow)
+        {
+            ResetTimer();
+            UpdateTimerUI();
+        }
     }
 
     public void ResetTimer()
