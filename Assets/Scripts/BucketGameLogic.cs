@@ -61,6 +61,41 @@ public class BucketGameLogic : MonoBehaviour
     public TMPro.TextMeshProUGUI pointsGainedText;
     public float pointsGainedShowSeconds = 1f;
 
+    [Header("Recipe Popup UI")] public GameObject recipePanel;
+    public Image recipeIconImage;
+    public TextMeshProUGUI recipeText;
+
+    public Sprite cakeSprite;
+
+    [Header("Reward Sequence")] 
+    // How long input will be disabled
+    public float rewardLockSeconds = 10.5f;
+    // Duration of fill animation
+    public float pourDurationSeconds = 10f;
+    
+    [Header("Pour and Fill Visuals")]
+    public GameObject pourStreamGameObject;
+    public SpriteRenderer pourStreamSpriteRenderer;
+    public SpriteRenderer smallBucketFillUISpriteRenderer;
+
+    private bool rewardActive;
+    private float rewardStartTime;
+    private float rewardEndTime;
+
+    private string challengeRowId;
+    private string cakeFlavorId;
+    
+    private Color rewardColor = Color.white;
+    private bool lockSteppingInput;
+
+    private Vector3 smallBucketFillFullScale;
+
+    [Header("Small Bucket Reset")] 
+    public float smallBucketResetDelaySeconds = 20f;
+
+    private bool pendingSmallBucketReset;
+    private float smallBucketResetAt;
+
     private void OnDestroy()
     {
         if (timer != null)
@@ -77,6 +112,11 @@ public class BucketGameLogic : MonoBehaviour
             Debug.LogError("One of the Game logic Elements missing");
             enabled = false;
             return;
+        }
+
+        if (smallBucketFillUISpriteRenderer)
+        {
+            smallBucketFillFullScale = smallBucketFillUISpriteRenderer.transform.localScale;
         }
 
         startCharacterPos = characterRoot.position;
@@ -99,6 +139,22 @@ public class BucketGameLogic : MonoBehaviour
     {
         if (isGameOver || isWin)
         {
+            return;
+        }
+        
+        if (pendingSmallBucketReset && Time.time >= smallBucketResetAt)
+        {
+            ResetFillVisual();
+            
+            // Reset liquid tint to default
+            ApplyPourColor(Color.white);
+            
+            pendingSmallBucketReset = false;
+        }
+        
+        if (rewardActive)
+        {
+            UpdateRewardSequence();
             return;
         }
         
@@ -148,8 +204,7 @@ public class BucketGameLogic : MonoBehaviour
             if (AllColumnsCleared())
             {
                 // Success
-                AwardChallengePoints();
-                EndChallengeAndDeleteTopRow();
+                BeginRewardSequence();
             }
         }
     }
@@ -253,6 +308,29 @@ public class BucketGameLogic : MonoBehaviour
 
         mode = Mode.Challenge;
         challengeIsCake = isCake;
+        
+        // Cache the recipe ingredient
+        if (isCake)
+        {
+            cakeFlavorId = "";
+            for (int c = 0; c < grid.Columns; c++)
+            {
+                string id = NormalizeIdFromCell(grid.Cell(topRow, c));
+                if (id != Normalize(eggId))
+                {
+                    cakeFlavorId = id;
+                    break;
+                }
+            }
+            
+            // Use flavor for color and text
+            challengeRowId = cakeFlavorId;
+        }
+        else
+        {
+            challengeRowId = NormalizeIdFromCell(grid.Cell(topRow, 0));
+            cakeFlavorId = "";
+        }
         
         Array.Clear(clearedColumn, 0, clearedColumn.Length);
         
@@ -426,6 +504,88 @@ public class BucketGameLogic : MonoBehaviour
             characterRoot.position += delta;
         }
     }
+
+    private void BeginRewardSequence()
+    {
+        if (rewardActive)
+        {
+            return;
+        }
+        
+        // Award points and sounds
+        AwardChallengePoints();
+        
+        // Show recipe UI
+        ShowRecipeUI();
+        
+        // Start pour and fill visuals
+        rewardColor = GetColorForIngredient(challengeRowId);
+        ApplyPourColor(rewardColor);
+        ResetFillVisual();
+        if (pourStreamGameObject)
+        {
+            pourStreamGameObject.SetActive(true);
+            RestartPourAnimation();
+        }
+        
+        // Lock stepping input for a moment
+        lockSteppingInput = true;
+        rewardActive = true;
+        rewardStartTime = Time.time;
+        rewardEndTime = Time.time + Mathf.Max(0.1f, rewardLockSeconds);
+        
+        // Stop the countdown during reward
+        if (timer)
+        {
+            timer.enabled = false;
+        }
+    }
+
+    private void UpdateRewardSequence()
+    {
+        if (!rewardActive)
+        {
+            return;
+        }
+
+        float t = 0f;
+
+        if (pourDurationSeconds > 0.01f)
+        {
+            t = Mathf.Clamp01((Time.time - rewardStartTime) / pourDurationSeconds);
+        }
+        else
+        {
+            t = 1f;
+        }
+
+        SetFillAmount(t);
+
+        if (Time.time >= rewardEndTime)
+        {
+            // End visuals
+            if (pourStreamGameObject)
+            {
+                pourStreamGameObject.SetActive(false);
+            }
+            
+            // Hide recipe UI
+            if (recipePanel)
+            {
+                recipePanel.SetActive(false);
+            }
+
+            rewardActive = false;
+            lockSteppingInput = false;
+            
+            // Remove row and continue
+            EndChallengeAndDeleteTopRow();
+            
+            // Schedule instant reset later
+            pendingSmallBucketReset = true;
+            smallBucketResetAt = Time.time + Mathf.Max(0f, smallBucketResetDelaySeconds);
+        }
+    }
     
     /* -------------------------------------------------------
                         Id Helpers
@@ -554,5 +714,162 @@ public class BucketGameLogic : MonoBehaviour
         }
         
         pointsGainedText.gameObject.SetActive(false);
+    }
+    
+    /* -------------------------------------------------------
+                        UI Helpers
+     ----------------------------------------------------------*/
+    private void ShowRecipeUI()
+    {
+        if (!recipePanel || !recipeText)
+        {
+            return;
+        }
+        
+        // Icon
+        if (recipeIconImage)
+        {
+            if (challengeIsCake && cakeSprite)
+            {
+                recipeIconImage.sprite = cakeSprite;
+                recipeIconImage.enabled = true;
+            }
+            else
+            {
+                // Use the cached challengeRowId
+                Sprite icon = grid.GetSpriteForId(challengeRowId);
+                recipeIconImage.sprite = icon;
+                recipeIconImage.enabled = (icon != null);
+            }
+        }
+        
+        // Text
+        if (challengeIsCake)
+        {
+            recipeText.text = $"You've Made {PrettyName(cakeFlavorId)} Cake!";
+        }
+        else
+        {
+            string id = challengeRowId;
+
+            if (id.Contains("grapes"))
+            {
+                recipeText.text = "You've Made Wine!";
+            }
+            else if (id.Contains("chocolate"))
+            {
+                recipeText.text = "You've Made Hot Chocolate!";
+            }
+            else
+            {
+                recipeText.text = $"You've Made {PrettyName(id)} Juice!";
+            }
+        }
+        
+        recipePanel.SetActive(true);
+    }
+
+    private string PrettyName(string id)
+    {
+        id = Normalize(id);
+        if (string.IsNullOrEmpty(id))
+        {
+            return "Recipe";
+        }
+        
+        return char.ToUpper(id[0]) + id.Substring(1);
+    }
+
+    private void ApplyPourColor(Color color)
+    {
+        if (pourStreamSpriteRenderer)
+        {
+            pourStreamSpriteRenderer.color = color;
+        }
+
+        if (smallBucketFillUISpriteRenderer)
+        {
+            smallBucketFillUISpriteRenderer.color = color;
+        }
+    }
+
+    private void ResetFillVisual()
+    {
+        if (smallBucketFillUISpriteRenderer)
+        {
+            var s = smallBucketFillFullScale;
+            s.y = 0f;
+            smallBucketFillUISpriteRenderer.transform.localScale = s;
+        }
+    }
+
+    private void SetFillAmount(float amount)
+    {
+        if (smallBucketFillUISpriteRenderer)
+        {
+            amount = Mathf.Clamp01(amount);
+            var s = smallBucketFillFullScale;
+            s.y = smallBucketFillFullScale.y * amount;
+            smallBucketFillUISpriteRenderer.transform.localScale = s;
+        }
+    }
+
+    private Color GetColorForIngredient(string id)
+    {
+        id = Normalize(id);
+
+        if (id.Contains("carrot") || id.Contains("pumpkin") || id.Contains("orange"))
+        {
+            return new Color(01f, 0.55f, 0.1f);
+        }
+
+        if (id.Contains("apple") || id.Contains("tomato") || id.Contains("cherries"))
+        {
+            return new Color(0.9f, 0.2f, 0.2f);
+        }
+
+        if (id.Contains("watermelon"))
+        {
+            return new Color(1f, 0.4f, 0.4f);
+        }
+
+        if (id.Contains("kiwi"))
+        {
+            return new Color(0.3f, 0.85f, 0.25f);
+        }
+
+        if (id.Contains("banana") || id.Contains("lemon"))
+        {
+            return new Color(0.9f, 0.75f, 0.25f);
+        }
+
+        if (id.Contains("grapes"))
+        {
+            return new Color(0.6f, 0.25f, 0.9f);
+        }
+
+        if (id.Contains("chocolate"))
+        {
+            return new Color(0.25f, 0.15f, 0.08f);
+        }
+        
+        return Color.white;
+    }
+
+    private void RestartPourAnimation()
+    {
+        if (!pourStreamGameObject)
+        {
+            return;
+        }
+        
+        var anim = pourStreamGameObject.GetComponent<Animator>();
+
+        if (anim)
+        {
+            anim.Rebind();
+            anim.Update(0f);
+            anim.Play(0, 0, 0f);
+        }
     }
 }
