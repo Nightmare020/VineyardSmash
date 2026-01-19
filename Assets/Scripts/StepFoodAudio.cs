@@ -49,4 +49,9 @@ public class StepFoodAudio : MonoBehaviour
             sfxSource.PlayOneShot(cakeReadyClip);
         }
     }
+
+    public float GetPourDuration()
+    {
+        return ingredientClearClip ? ingredientClearClip.length : 0;
+    }
 }

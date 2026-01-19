@@ -406,11 +406,6 @@ public class BucketGameLogic : MonoBehaviour
         score.Add(gainedNormal);
         
         ShowPointsGained(gainedNormal);
-        
-        if (audioCtrl)
-        {
-            audioCtrl.PlayIngredientClear();
-        }
     }
 
     private bool AllColumnsCleared()
@@ -533,6 +528,24 @@ public class BucketGameLogic : MonoBehaviour
         rewardActive = true;
         rewardStartTime = Time.time;
         rewardEndTime = Time.time + Mathf.Max(0.1f, rewardLockSeconds);
+
+        float pourLen = 0f;
+        if (audioCtrl)
+        {
+            pourLen = audioCtrl.GetPourDuration();
+            audioCtrl.PlayIngredientClear();
+        }
+        
+        // Fallback if missing clip
+        if (pourLen <= 0.05f)
+        {
+            pourLen = 1f;
+        }
+        
+        // Make pour animation and fill last exactly the pour audio duration
+        pourDurationSeconds = pourLen;
+        rewardLockSeconds = pourLen;
+        
         
         // Stop the countdown during reward
         if (timer)
@@ -871,5 +884,14 @@ public class BucketGameLogic : MonoBehaviour
             anim.Update(0f);
             anim.Play(0, 0, 0f);
         }
+    }
+
+    public void QuitGame()
+    {
+        Application.Quit();
+
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#endif
     }
 }
